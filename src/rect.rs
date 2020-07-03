@@ -6,6 +6,7 @@ pub struct Rect {
     height: i32,
     fill: bool,
 }
+#[allow(dead_code)]
 impl Rect{
     pub fn new(x0: i32, y0: i32, width: i32, height: i32, fill: bool) -> Rect{
         Rect{
@@ -36,6 +37,6 @@ impl Shape for Rect {
                 }
             }
         }
-        return cells;
+        return cells
     }
 }

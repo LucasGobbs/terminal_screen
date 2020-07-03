@@ -3,23 +3,22 @@ pub struct Circle {
     x0: i32,
     y0: i32,
     radius: i32,
-    fill: bool,
+
 }
 impl Circle{
-    pub fn new(x0: i32, y0: i32, radius: i32, fill: bool) -> Circle{
+    pub fn new(x0: i32, y0: i32, radius: i32) -> Circle{
         Circle{
             x0,
             y0,
             radius,
-            fill,
         }
     }
 }
 impl Shape for Circle {
     fn get_cells(&self) -> Vec<(i32,i32)>{
         let mut cells: Vec<(i32,i32)> = Vec::new();
-        let mut x0 = self.x0;
-        let mut y0 = self.y0;
+        let x0 = self.x0;
+        let y0 = self.y0;
         let mut r = self.radius;
         let mut x = -r;
         let mut y = 0;

@@ -1,4 +1,4 @@
-use tetra::graphics::{self, Color};
+use tetra::graphics::Color;
 use itertools::izip;
 use crate::shape::Shape;
 #[derive(Clone, Copy, Debug)]
@@ -17,7 +17,7 @@ pub struct Buffer {
     height: usize,
     size: usize,
 }
-
+#[allow(dead_code)]
 impl Buffer {
     pub fn new(width: usize, height: usize) -> Buffer {
         Buffer {
@@ -106,7 +106,6 @@ impl Buffer {
                 None => {},
             }
         }
-        
     }
     fn flood_fill_iterative(&mut self, x: i32, y: i32, from_glyph: char, to_glyph: char, color: Color ){
         if self.check_bound(x, y){
@@ -282,7 +281,7 @@ impl Buffer {
             }
         }
     }
-    pub fn subAssign(&mut self, other: Buffer){
+    pub fn sub_assign(&mut self, other: Buffer){
         for (mut cell_self,cell_other) in izip!(&mut self.data, other.data){
             if cell_other.glyph != ' '{
                 cell_self.glyph = ' ';
@@ -291,7 +290,7 @@ impl Buffer {
             }
         }
     }
-    pub fn addAssign(&mut self, other: Buffer){
+    pub fn add_assign(&mut self, other: Buffer){
         for (mut cell_self,cell_other) in izip!(&mut self.data, other.data){
             if cell_self.glyph == ' ' && cell_other.glyph != ' '{
                 cell_self.glyph = cell_other.glyph;

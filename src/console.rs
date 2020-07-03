@@ -1,12 +1,12 @@
-use tetra::graphics::{self, Color, DrawParams, Rectangle, Texture};
+use tetra::graphics::{self, DrawParams, Rectangle, Texture};
 use tetra::math::Vec2;
 use tetra::Context;
 use itertools::izip;
 
 
-use crate::buffer::{Buffer,ConsoleCell};
+use crate::buffer::{Buffer};
 
-
+#[allow(dead_code)]
 pub struct Console {
     font: Texture,
     width: usize,

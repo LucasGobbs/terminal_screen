@@ -6,13 +6,14 @@ mod line;
 mod circle;
 mod rect;
 mod triangle;
+
 use tetra::graphics::{self, Color, Texture};
 use tetra::input::{self, Key};
-use tetra::time::get_fps;
+use tetra::time::*;
 use tetra::{Context, ContextBuilder, State};
-use rand::Rng;
 
-use std::time::{Duration, Instant};
+
+
 
 
 use crate::console::{Console};
@@ -42,7 +43,7 @@ impl Drop {
         }
     }
     pub fn rand() -> Drop {
-        let mut rng = rand::thread_rng();
+        
         let x: i32 = rand::random::<i32>()% 150;
         let y: i32 = rand::random::<i32>() % 100 - 100;
         let r: u8 = rand::random::<u8>();
@@ -56,7 +57,7 @@ struct GameState {
     //resources: Resources,
     drops: Vec<Drop>,
     console: Console,
-    size: i32,
+    el_time: f32,
 }
 
 impl GameState {
@@ -76,7 +77,7 @@ impl GameState {
            // resources,
             drops,
             console,
-            size: 25,
+            el_time: 0.0,
         })
     }
 }
@@ -89,8 +90,9 @@ impl State for GameState {
                 *drop = Drop::rand();
             }
         }
-        let x = input::get_mouse_wheel_movement(ctx).y;
-        self.size += x;
+        self.el_time += get_delta_time(ctx).as_secs_f32();
+       
+
 
         Ok(())
     }
@@ -100,45 +102,25 @@ impl State for GameState {
 
         self.console.clear();
         
-        self.console.temp_buffer.set_char(15,15,'2',Color::GREEN);
-        self.console.temp_buffer.set_char(16,16,'3',Color::GREEN);
+        self.console.temp_buffer.set_char(0,0,'2',Color::GREEN);
+        self.console.temp_buffer.set_string(0,1,format!("fps: {}",get_fps(ctx)).as_str(),Color::WHITE);
+        
+        self.console.temp_buffer.g_draw(Circle::new(75,50,40), '#',Color::rgb8(80,20,120));
      
-        self.console.temp_buffer.set_string(15,16,format!("fps: {}",get_fps(ctx)).as_str(),Color::WHITE);
-        self.console.temp_buffer.set_string(15,17,format!("Raio: {}",self.size).as_str(),Color::WHITE);
+        self.console.temp_buffer.flood_fill(75,40, '.', Color::rgba8(80,20,120,170));
         
-        let mut ta = Buffer::new(200,200);
-        let mut tb = Buffer::new(200,200);
-        let mut tc = Buffer::new(200,200);
-        ta.g_draw(Circle::new(50,50,self.size,true),'#',Color::RED);
-        tb.g_draw(Circle::new(50,50,self.size,true),'#',Color::RED);
-        tc.g_draw(Circle::new(50,50,self.size,true),'#',Color::RED);
-        self.console.temp_buffer.g_draw(Circle::new(50,50,self.size,true),'#',Color::RED);
-        if input::is_key_down(ctx,Key::C){
-            //print!("CLICANDO");
-            self.console.temp_buffer.flood_fill_rec(50,50, '.', Color::GREEN);
-        } else {
-            self.console.temp_buffer.flood_fill(50,50, '.', Color::GREEN);
-        }
-        
-        print!("Raio: {}\n",self.size);
-
-        /*
-        let now = Instant::now();
-        ta.flood_fill(50,50, '.', Color::GREEN);
-        print!("Iterativo: {}\n", now.elapsed().as_micros());
-
-    
-        //let now2 = Instant::now();
-        //tb.flood_fill_rec(50,50, '.', Color::GREEN);
-       // print!("Recursivo: {}\n\n\n", now2.elapsed().as_micros());
-
-        let now3 = Instant::now();
-        tc.flood_fill_rec2(50,50, '.', Color::GREEN);
-        print!("Recursivo 2: {}\n\n\n", now3.elapsed().as_micros());
-        // */
+        let mx = (75.0 + self.el_time.cos() * 40.0) as i32;
+        let my = (50.0 + self.el_time.sin() * 40.0) as i32;
+      
+        self.console.temp_buffer.g_draw(Line::new(75,50,mx,my),'@',Color::WHITE);
+        self.console.temp_buffer.g_draw(Triangle::new(mx, my-10,mx-10,my+10,mx+10,my+10),'0',Color::WHITE);
         for drop in &self.drops {
             self.console.temp_buffer.set_char(drop.x, drop.y, '|', Color::rgb8(drop.r,drop.g,drop.b));
         }
+
+        let mousex = (input::get_mouse_position(ctx).x / 8.0) as i32;
+        let mousey = (input::get_mouse_position(ctx).y / 8.0) as i32;
+        self.console.temp_buffer.g_draw(Rect::new(mousex -2,mousey-4,4,8,true), 'm', Color::rgb(1.0,1.0,0.0));
         //self.console.temp_buffer.sub(t_buffer);
         self.console.draw(ctx);
         
@@ -149,10 +131,7 @@ impl State for GameState {
 }
 
 fn main() -> tetra::Result {
-    let lin = Line::new(0,0,4,1);
-    for cell in  lin.get_cells(){
-        print!("{} {}\n",cell.0,cell.1);
-    }
+
     ContextBuilder::new("Rogue Terminal", 150 * 8, 100 * 8)
        // .timestep(Timestep::Fixed(30.0))
         .quit_on_escape(true)
