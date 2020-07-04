@@ -24,6 +24,18 @@ use crate::rect::Rect;
 use crate::buffer::Buffer;
 use crate::triangle::Triangle;
 
+struct Player {
+    x: i32,
+    y: i32,
+}
+impl Player {
+    pub fn new(x: i32, y: i32) -> Player {
+        Player {
+            x,
+            y,
+        }
+    }
+}
 #[derive(Clone, Copy)]
 struct Drop {
     x: i32,
@@ -56,9 +68,11 @@ struct GameState {
     //world: World,
     //resources: Resources,
     drops: Vec<Drop>,
+    player: Player,
     console: Console,
     el_time: f32,
 }
+
 
 impl GameState {
     fn new(ctx: &mut Context) -> tetra::Result<GameState> {
@@ -75,6 +89,7 @@ impl GameState {
         Ok(GameState {
            // world,
            // resources,
+            player: Player::new(50,50),
             drops,
             console,
             el_time: 0.0,
@@ -92,7 +107,11 @@ impl State for GameState {
         }
         self.el_time += get_delta_time(ctx).as_secs_f32();
        
-
+        if input::is_key_down(ctx, Key::D){
+            self.player.x += 1;
+        } else if input::is_key_down(ctx, Key::A){
+            self.player.x -= 1;
+        }
 
         Ok(())
     }
@@ -105,22 +124,24 @@ impl State for GameState {
         self.console.temp_buffer.set_char(0,0,'2',Color::GREEN);
         self.console.temp_buffer.set_string(0,1,format!("fps: {}",get_fps(ctx)).as_str(),Color::WHITE);
         
-        self.console.temp_buffer.g_draw(Circle::new(75,50,40), '#',Color::rgb8(80,20,120));
-     
-        self.console.temp_buffer.flood_fill(75,40, '.', Color::rgba8(80,20,120,170));
         
-        let mx = (75.0 + self.el_time.cos() * 40.0) as i32;
-        let my = (50.0 + self.el_time.sin() * 40.0) as i32;
-      
-        self.console.temp_buffer.g_draw(Line::new(75,50,mx,my),'@',Color::WHITE);
-        self.console.temp_buffer.g_draw(Triangle::new(mx, my-10,mx-10,my+10,mx+10,my+10),'0',Color::WHITE);
+       
         for drop in &self.drops {
-            self.console.temp_buffer.set_char(drop.x, drop.y, '|', Color::rgb8(drop.r,drop.g,drop.b));
+            //self.console.temp_buffer.set_char(drop.x, drop.y, '|', Color::rgb8(drop.r,drop.g,drop.b));
         }
 
         let mousex = (input::get_mouse_position(ctx).x / 8.0) as i32;
         let mousey = (input::get_mouse_position(ctx).y / 8.0) as i32;
-        self.console.temp_buffer.g_draw(Rect::new(mousex -2,mousey-4,4,8,true), 'm', Color::rgb(1.0,1.0,0.0));
+        if input::is_mouse_button_down(ctx, input::MouseButton::Left){
+            self.console.temp_buffer.g_draw(Line::new(self.player.x,
+                                                             self.player.y,
+                                                             mousex,
+                                                             mousey), 
+                                            '.', Color::WHITE);
+        }
+        self.console.temp_buffer.set_char(self.player.x,self.player.y,'█',Color::GREEN);
+        self.console.temp_buffer.set_char(mousex,mousey,'*',Color::GREEN);
+        //self.console.temp_buffer.g_draw(Rect::new(mousex -2,mousey-4,4,8,true), 'm', Color::rgb(1.0,1.0,0.0));
         //self.console.temp_buffer.sub(t_buffer);
         self.console.draw(ctx);
         
@@ -132,7 +153,7 @@ impl State for GameState {
 
 fn main() -> tetra::Result {
 
-    ContextBuilder::new("Rogue Terminal", 150 * 8, 100 * 8)
+    ContextBuilder::new("Terminal", 150 * 8, 100 * 8)
        // .timestep(Timestep::Fixed(30.0))
         .quit_on_escape(true)
         .build()?

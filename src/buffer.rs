@@ -139,22 +139,11 @@ impl Buffer {
    
     }
     fn flood_fill_naive_recursive(&mut self, x: i32, y: i32, from_glyph: char, to_glyph: char, color: Color){
-       
-        
         if self.check_bound(x, y) {
-
             match self.get_char(x, y) {
                 Some(cell) => {
-                    if cell.glyph == from_glyph {
-                     
+                    if cell.glyph == from_glyph {       
                         self.set_char(x, y, to_glyph, color);
-                      //  self.set_char(x+1, y, to_glyph, color);
-                       // self.set_char(x-1, y, to_glyph, color);
-                       // self.set_char(x, y+1, to_glyph, color);
-                       // self.set_char(x, y-1, to_glyph, color);
-                        //    -     #-
-                        //  - # -  ###-
-                        //    -     #
                         self.flood_fill_naive_recursive(x+1,y,from_glyph,to_glyph, color);
                         self.flood_fill_naive_recursive(x-1,y,from_glyph,to_glyph, color);
                         self.flood_fill_naive_recursive(x,y+1,from_glyph,to_glyph, color);
@@ -163,7 +152,6 @@ impl Buffer {
                 }
                 None => {},
             }
-            
         } 
     }
     fn flood_fill_scanline_recursive(&mut self, x: i32, y: i32, from_glyph: char, to_glyph: char, color: Color){
@@ -298,5 +286,11 @@ impl Buffer {
                 cell_self.background = cell_other.background;
             }
         }
+    }
+    pub fn add(a: Buffer, b: Buffer) -> Buffer{
+        let new_buffer: Buffer =  Buffer::new(a.width, a.height);
+        
+
+        new_buffer
     }
 }
