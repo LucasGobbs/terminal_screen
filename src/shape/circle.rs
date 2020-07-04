@@ -1,9 +1,8 @@
-use crate::shape::Shape;
+use crate::shape::ShapeDrawable;
 pub struct Circle {
     x0: i32,
     y0: i32,
     radius: i32,
-
 }
 impl Circle{
     pub fn new(x0: i32, y0: i32, radius: i32) -> Circle{
@@ -14,7 +13,7 @@ impl Circle{
         }
     }
 }
-impl Shape for Circle {
+impl ShapeDrawable for Circle {
     fn get_cells(&self) -> Vec<(i32,i32)>{
         let mut cells: Vec<(i32,i32)> = Vec::new();
         let x0 = self.x0;

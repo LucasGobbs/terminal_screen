@@ -1,5 +1,5 @@
-use crate::shape::Shape;
-use crate::line::Line;
+use crate::shape::ShapeDrawable;
+use crate::shape::Line;
 pub struct Triangle {
     x0: i32,
     y0: i32,
@@ -21,7 +21,7 @@ impl Triangle{
         }
     }
 }
-impl Shape for Triangle {
+impl ShapeDrawable for Triangle {
     fn get_cells(&self) -> Vec<(i32,i32)>{
         let mut cells: Vec<(i32,i32)> = Vec::new();
         let line_a = Line::new(self.x0,self.y0,self.x1,self.y1);

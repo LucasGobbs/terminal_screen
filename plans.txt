@@ -1,0 +1,60 @@
+= Buffer object =================================================================================
+description: stores console cells,
+
+= BufferDrawer trait =================================================================================
+description: interface to draw buffers, have to be implemented
+
+= Shape trait =================================================================================
+description: objects can implement of this to draw in buffer
+suports: Line, Rectangle, Circle 
+
+= Container  =================================================================================
+description: objects can implement of this to draw in buffer, with some context (more complex objects)
+suports: ...
+------------------------------------
+- Text ---
+
+------------------------------------
+- Box ------------------------------
++-| Title |---------+
+|                   |
+|                   |
+|                   |
++-----| Sub Text |--+
+fields {
+    gliph of corners (+),
+    gliph of vertical (|),
+    gliph of horizontal (-),
+
+    position,
+    size,
+    Title,
+    SubText,
+
+}
+-------------------------------------
+- CheckBox --------------------------
+[ x ] Text 
+fields {
+    gliph of selection ( [] ),
+    gliph of selected ( x ),
+    gliph of non selected ( ),
+    is Selected,
+
+    position,
+    size,
+    text,
+}
+-------------------------
+- Column -----------------
+Item 1
+Item 2  
+Item 3
+fields {
+    items: can be whatever container
+    position,
+    size,
+}
+-------------------------
+- Row -----------------
+Item 1 | Item 2 | Item 3

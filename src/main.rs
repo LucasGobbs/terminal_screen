@@ -1,12 +1,7 @@
-
-mod console;
+mod container;
 mod shape;
 mod buffer;
-mod line;
-mod circle;
-mod rect;
-mod triangle;
-
+mod console;
 use tetra::graphics::{self, Color, Texture};
 use tetra::input::{self, Key};
 use tetra::time::*;
@@ -14,16 +9,11 @@ use tetra::{Context, ContextBuilder, State};
 
 
 
+use crate::container::*;
+use crate::shape::*;
 
-
-use crate::console::{Console};
-use crate::shape::Shape;
-use crate::line::Line;
-use crate::circle::Circle;
-use crate::rect::Rect;
 use crate::buffer::Buffer;
-use crate::triangle::Triangle;
-
+use crate::console::Console;
 struct Player {
     x: i32,
     y: i32,
@@ -125,7 +115,6 @@ impl State for GameState {
         self.console.temp_buffer.set_string(0,1,format!("fps: {}",get_fps(ctx)).as_str(),Color::WHITE);
         
         
-       
         for drop in &self.drops {
             //self.console.temp_buffer.set_char(drop.x, drop.y, '|', Color::rgb8(drop.r,drop.g,drop.b));
         }
@@ -143,6 +132,17 @@ impl State for GameState {
         self.console.temp_buffer.set_char(mousex,mousey,'*',Color::GREEN);
         //self.console.temp_buffer.g_draw(Rect::new(mousex -2,mousey-4,4,8,true), 'm', Color::rgb(1.0,1.0,0.0));
         //self.console.temp_buffer.sub(t_buffer);
+        let mut ttt = TextContainer::new();
+        ttt.pos(2, 5);
+        ttt.text(String::from("aloalaaldasdasd"));
+        //ttt.generate();
+
+        
+
+        self.console.temp_buffer.c_draw(&mut ttt);
+
+       
+        //self.console.temp_buffer.g_draw(Circle::new(10,10,30),'2',Color::BLUE);
         self.console.draw(ctx);
         
 

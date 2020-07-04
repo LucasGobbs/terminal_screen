@@ -1,6 +1,7 @@
 use tetra::graphics::Color;
 use itertools::izip;
-use crate::shape::Shape;
+use crate::shape::ShapeDrawable;
+use crate::container::ContainerDrawable;
 #[derive(Clone, Copy, Debug)]
 pub struct ConsoleCell {
     pub glyph: char,
@@ -10,6 +11,7 @@ pub struct ConsoleCell {
 }
 #[derive(Clone)]
 pub struct Buffer {
+    //pub data: [ConsoleCell; width],
     pub data: Vec<ConsoleCell>,
    // x: i32,
    // y: i32,
@@ -65,15 +67,21 @@ impl Buffer {
         }
     }
     pub fn g_draw<T>(&mut self, shape: T, glyph: char, color: Color)
-    where T: Shape{
+    where T: ShapeDrawable{
         let cells = shape.get_cells();
 
         for cell in cells {
             self.set_char(cell.0, cell.1, glyph, color);
         }
     }
+    pub fn c_draw<T>(&mut self, container: &mut T)
+    where T: ContainerDrawable{
+        let (buf,x,y) = container.generate();
+      
+        self.add_onTop(buf, x,y,true);
+    }
     pub fn g_draw_c<T>(&mut self, shape: T, glyph: char,color: impl Fn(i32, i32, i32, i32) -> Color)
-    where T: Shape{
+    where T: ShapeDrawable{
         let cells = shape.get_cells();
         for (index,cell) in cells.iter().enumerate() {
             let color_t = color(cells.len() as i32, index as i32, cell.0, cell.1);
@@ -269,28 +277,26 @@ impl Buffer {
             }
         }
     }
-    pub fn sub_assign(&mut self, other: Buffer){
-        for (mut cell_self,cell_other) in izip!(&mut self.data, other.data){
-            if cell_other.glyph != ' '{
-                cell_self.glyph = ' ';
-                cell_self.foreground = Color::rgb(1.0, 1.0, 1.0);
-                cell_self.background = Color::rgb(0.0, 0.0, 0.0);
-            }
+   
+    pub fn print(&mut self){
+        for (i,cell) in self.data.iter().enumerate() {
+            let (x, y) = (i % self.width, i / self.width);
+            print!("x: {}| Y: {}| g: {}\n",x,y,cell.glyph);
+            //print!("{} {}\n",cell.glyph, y);
         }
     }
-    pub fn add_assign(&mut self, other: Buffer){
-        for (mut cell_self,cell_other) in izip!(&mut self.data, other.data){
-            if cell_self.glyph == ' ' && cell_other.glyph != ' '{
-                cell_self.glyph = cell_other.glyph;
-                cell_self.foreground = cell_other.foreground;
-                cell_self.background = cell_other.background;
+    pub fn add_onTop(&mut self,buf: Buffer, x0: i32, y0: i32, ignore_whitespace: bool){
+        for (i,cell) in buf.data.iter().enumerate() {
+            let (x, y) = (i % buf.width, i / buf.width);
+            if ignore_whitespace {
+                if cell.glyph != ' '{
+                    self.set_char(x0 + x as i32, y0  + y as i32,cell.glyph,cell.foreground);
+                }
+            } else {
+                self.set_char(x0 + x as i32, y0  + y as i32,cell.glyph,cell.foreground);
             }
+            
+            //print!("{} {}\n",cell.glyph, y);
         }
-    }
-    pub fn add(a: Buffer, b: Buffer) -> Buffer{
-        let new_buffer: Buffer =  Buffer::new(a.width, a.height);
-        
-
-        new_buffer
     }
 }

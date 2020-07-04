@@ -1,4 +1,4 @@
-use crate::shape::Shape;
+use crate::shape::ShapeDrawable;
 pub struct Line {
     x0: i32,
     y0: i32,
@@ -15,7 +15,7 @@ impl Line {
         }
     }
 }
-impl Shape for Line {
+impl ShapeDrawable for Line {
     fn get_cells(&self) -> Vec<(i32,i32)>{
         let mut cells: Vec<(i32,i32)> = Vec::new();
 
