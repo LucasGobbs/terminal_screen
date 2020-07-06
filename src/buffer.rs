@@ -1,7 +1,8 @@
 use tetra::graphics::Color;
 use itertools::izip;
 use crate::shape::ShapeDrawable;
-use crate::container::ContainerDrawable;
+//use crate::container::ContainerDrawable;
+use crate::component::ComponentDrawable;
 #[derive(Clone, Copy, Debug)]
 pub struct ConsoleCell {
     pub glyph: char,
@@ -74,9 +75,9 @@ impl Buffer {
             self.set_char(cell.0, cell.1, glyph, color);
         }
     }
-    pub fn c_draw<T>(&mut self, container: &mut T)
-    where T: ContainerDrawable{
-        let (buf,x,y) = container.generate();
+    pub fn c_draw<T>(&mut self, component: &mut T)
+    where T: ComponentDrawable{
+        let (buf,x,y) = component.generate();
       
         self.add_onTop(buf, x,y,true);
     }

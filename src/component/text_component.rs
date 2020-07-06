@@ -1,30 +1,31 @@
-use crate::container::ContainerDrawable;
+
+use crate::component::ComponentDrawable;
 use crate::buffer::Buffer;
 use tetra::graphics::Color;
-pub struct TextContainer{
+pub struct TextComponent{
     data: Option<Buffer>,
     pos: Option<(i32,i32)>,
     text: Option<String>,
 }
-impl TextContainer {
-    pub fn new() -> TextContainer{
-        TextContainer{
+impl TextComponent {
+    pub fn new() -> TextComponent{
+        TextComponent{
             data: None,
             pos: Some((0,0)),
             text: None,
         }
     }
-    pub fn pos(&mut self, x: i32, y: i32) -> &mut TextContainer {
+    pub fn pos(mut self, x: i32, y: i32) -> Self {
         self.pos = Some((x,y));
         self
     }
-    pub fn text(&mut self, text: String) -> &mut TextContainer {
+    pub fn text(mut self, text: String) -> Self {
         self.text = Some(text);
        
         self
     }
 }
-impl ContainerDrawable for TextContainer {
+impl ComponentDrawable for TextComponent {
     fn get_buffer(&mut self) -> (Box<&Buffer>,i32,i32){
         let cl = Box::new(self.data.as_ref().unwrap());
 
@@ -42,7 +43,7 @@ impl ContainerDrawable for TextContainer {
         let mut buf = Buffer::new(size.0 as usize,size.1 as usize);
         for (i, ch) in self.text.as_ref().unwrap().chars().enumerate() {
             buf.set_char(i as i32, 0,ch, Color::RED);
-            print!("x: {}+{}|y: {}| {}| size: {} {}\n",pos.0,i,pos.1,ch,size.0,size.1);
+            //print!("x: {}+{}|y: {}| {}| size: {} {}\n",pos.0,i,pos.1,ch,size.0,size.1);
         }
         //buf.print();
         (buf, pos.0, pos.1)

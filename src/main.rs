@@ -1,7 +1,8 @@
-mod container;
+//mod container;
 mod shape;
 mod buffer;
 mod console;
+mod component;
 use tetra::graphics::{self, Color, Texture};
 use tetra::input::{self, Key};
 use tetra::time::*;
@@ -9,7 +10,7 @@ use tetra::{Context, ContextBuilder, State};
 
 
 
-use crate::container::*;
+use crate::component::*;
 use crate::shape::*;
 
 use crate::buffer::Buffer;
@@ -132,16 +133,14 @@ impl State for GameState {
         self.console.temp_buffer.set_char(mousex,mousey,'*',Color::GREEN);
         //self.console.temp_buffer.g_draw(Rect::new(mousex -2,mousey-4,4,8,true), 'm', Color::rgb(1.0,1.0,0.0));
         //self.console.temp_buffer.sub(t_buffer);
-        let mut ttt = TextContainer::new();
-        ttt.pos(2, 5);
-        ttt.text(String::from("aloalaaldasdasd"));
-        //ttt.generate();
-
+        let mut tcmp = TextComponent::new().pos(2, 5)
+                                                              .text(String::from("Alo"));
         
-
-        self.console.temp_buffer.c_draw(&mut ttt);
-
-       
+        let mut dimp = DividerComponent::new(10,10,9);
+        self.console.temp_buffer.c_draw( &mut tcmp);
+        self.console.temp_buffer.c_draw( &mut dimp);
+        let mut dimp2 = DividerComponent::new(10,15,9).centered();
+        self.console.temp_buffer.c_draw( &mut dimp2);
         //self.console.temp_buffer.g_draw(Circle::new(10,10,30),'2',Color::BLUE);
         self.console.draw(ctx);
         
