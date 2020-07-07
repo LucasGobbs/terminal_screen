@@ -75,11 +75,11 @@ impl Buffer {
             self.set_char(cell.0, cell.1, glyph, color);
         }
     }
-    pub fn c_draw<T>(&mut self, component:  T)
-    where T: ComponentDrawable{
-        let pos = component.get_position();
-      
-        self.add_on_top(component.get_buffer(), pos.0,pos.1,true);
+    pub fn c_draw<T>(&mut self, component: T)
+    where T: ComponentDrawable + Clone{
+        let pos = component.clone().get_position();
+        let buf = component.clone().get_buffer();
+        self.add_on_top(buf, pos.0,pos.1,true);
     }
     pub fn g_draw_c<T>(&mut self, shape: T, glyph: char,color: impl Fn(i32, i32, i32, i32) -> Color)
     where T: ShapeDrawable{
@@ -286,7 +286,7 @@ impl Buffer {
             //print!("{} {}\n",cell.glyph, y);
         }
     }
-    pub fn add_on_top(&mut self,buf: Box<&Buffer>, x0: i32, y0: i32, ignore_whitespace: bool){
+    pub fn add_on_top(&mut self,buf: Buffer, x0: i32, y0: i32, ignore_whitespace: bool){
         for (i,cell) in buf.data.iter().enumerate() {
             let (x, y) = (i % buf.width, i / buf.width);
             if ignore_whitespace {

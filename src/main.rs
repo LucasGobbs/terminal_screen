@@ -143,13 +143,14 @@ impl State for GameState {
         //                                                      .text(String::from("Alo"));
      
         let mut life_txt = TextComponent::new(ComponentBuilder::default()
-                                                                                        .pos((5,0))
-                                                                                        .size((5,0))
+                                                                                        .pos((10,10))
+                                                                                        
                                                                                         .changed(false));
         life_txt.add_text("Life:", Color::WHITE)
-                .generate();                              
+        .add_text("Pf funciona",Color::RED)
+        .generate();                              
        
-        self.console.temp_buffer.c_draw(    life_txt.clone());
+        self.console.temp_buffer.c_draw(    life_txt);
         //let mut dimp2 = DividerComponent::new(10,15,9).centered();
       
         //self.console.temp_buffer.g_draw(Circle::new(10,10,30),'2',Color::BLUE);
