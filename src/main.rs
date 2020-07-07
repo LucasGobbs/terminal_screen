@@ -1,7 +1,9 @@
 //mod container;
+extern crate derive_builder;
 mod shape;
 mod buffer;
 mod console;
+#[macro_use]
 mod component;
 use tetra::graphics::{self, Color, Texture};
 use tetra::input::{self, Key};
@@ -9,9 +11,12 @@ use tetra::time::*;
 use tetra::{Context, ContextBuilder, State};
 
 
+
+
 use regex::*;
 use std::fmt::{self, Display};
-use crate::component::*;
+use crate::component::{Component, ComponentDrawable,TextComponent, ComponentBuilder};
+
 use crate::shape::*;
 
 use crate::buffer::Buffer;
@@ -134,14 +139,19 @@ impl State for GameState {
         self.console.temp_buffer.set_char(mousex,mousey,'*',Color::GREEN);
         //self.console.temp_buffer.g_draw(Rect::new(mousex -2,mousey-4,4,8,true), 'm', Color::rgb(1.0,1.0,0.0));
         //self.console.temp_buffer.sub(t_buffer);
-        let mut tcmp = TextComponent::new().pos(2, 5)
-                                                              .text(String::from("Alo"));
-        
-        let mut dimp = DividerComponent::new(10,10,9);
-        self.console.temp_buffer.c_draw( &mut tcmp);
-        self.console.temp_buffer.c_draw( &mut dimp);
-        let mut dimp2 = DividerComponent::new(10,15,9).centered();
-        self.console.temp_buffer.c_draw( &mut dimp2);
+        //let mut tcmp = TextComponent::new().pos(2, 5)
+        //                                                      .text(String::from("Alo"));
+     
+        let mut life_txt = TextComponent::new(ComponentBuilder::default()
+                                                                                        .pos((5,0))
+                                                                                        .size((5,0))
+                                                                                        .changed(false));
+        life_txt.add_text("Life:", Color::WHITE)
+                .generate();                              
+       
+        self.console.temp_buffer.c_draw(    life_txt.clone());
+        //let mut dimp2 = DividerComponent::new(10,15,9).centered();
+      
         //self.console.temp_buffer.g_draw(Circle::new(10,10,30),'2',Color::BLUE);
         self.console.temp_buffer.set_string(1,50,"Life:",Color::WHITE);
         self.console.temp_buffer.set_string(7,50,"9",Color::RED);

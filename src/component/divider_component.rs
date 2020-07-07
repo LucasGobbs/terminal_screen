@@ -1,11 +1,8 @@
-use crate::component::ComponentDrawable;
+use crate::component::{ComponentDrawable,ComponentBuilder, Component};
 use crate::buffer::Buffer;
 use tetra::graphics::Color;
 pub struct DividerComponent {
-    x0: i32,
-    y0: i32,
-    data: Option<Buffer>,
-    size: i32,
+    component: Component,
     centered: bool,
     horizontal: bool,
     corners: char,
@@ -13,12 +10,9 @@ pub struct DividerComponent {
     center: char,
 }
 impl DividerComponent {
-    pub fn new(x0: i32, y0:i32 , size: i32) -> DividerComponent {
+    pub fn new(builder: ComponentBuilder) -> Self {
         DividerComponent {
-            x0,
-            y0,
-            size,
-            data: None,
+            component: builder.build().unwrap(),
             centered:false,
             horizontal:true,
             corners: '+',
@@ -49,20 +43,15 @@ impl DividerComponent {
 }
 impl ComponentDrawable for DividerComponent {
     fn get_buffer(&mut self) -> (Box<&Buffer>,i32,i32){
-        let cl = Box::new(self.data.as_ref().unwrap());
+        let cl = Box::new(self.component.data.as_ref().unwrap());
 
-        (cl,self.x0,self.y0)
+        (cl,self.component.pos.0,self.component.pos.1)
     }
-    fn get_position(&mut self) -> Option<(i32,i32)>{
-        Some((self.x0,self.y0))
+    fn get_position(self) -> (i32,i32){
+        self.component.pos
     }
-    fn get_size(&mut self) -> (i32,i32){
-        if self.horizontal {
-            return (self.size,1);
-        } else {
-            return (1,self.size);
-        }
-        
+    fn get_size(self) -> (i32,i32){
+        self.component.size
     }
     fn generate(&mut self) -> (Buffer,i32,i32){
         
@@ -83,9 +72,9 @@ impl ComponentDrawable for DividerComponent {
         loop{
             if xi == 0 && yi == 0 {
                 buf.set_char(xi, yi, self.corners, Color::BLUE);
-            } else if xi ==  self.size -1  || yi == self.size -1  {
+            } else if xi ==  max_size -1  || yi == max_size -1  {
                 buf.set_char(xi, yi, self.corners, Color::BLUE);
-            } else if xi ==  self.size/2 || yi == self.size/2 {
+            } else if xi ==  max_size/2 || yi == max_size/2 {
                 buf.set_char(xi, yi, self.center, Color::BLUE);
             } else {
                 buf.set_char(xi, yi, self.line, Color::BLUE);
@@ -100,9 +89,9 @@ impl ComponentDrawable for DividerComponent {
         
        // buf.print();
         if self.centered {
-            (buf, self.x0 - self.size / 2, self.y0)
+            (buf, self.component.pos.0 - max_size / 2, self.component.pos.1)
         } else {
-            (buf, self.x0, self.y0)
+            (buf, self.component.pos.0, self.component.pos.1)
         }
         
     }
