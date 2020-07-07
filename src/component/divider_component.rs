@@ -98,7 +98,7 @@ impl ComponentDrawable for DividerComponent {
             if index > max_size { break }
         }
         
-        buf.print();
+       // buf.print();
         if self.centered {
             (buf, self.x0 - self.size / 2, self.y0)
         } else {

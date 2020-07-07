@@ -9,7 +9,8 @@ use tetra::time::*;
 use tetra::{Context, ContextBuilder, State};
 
 
-
+use regex::*;
+use std::fmt::{self, Display};
 use crate::component::*;
 use crate::shape::*;
 
@@ -142,6 +143,10 @@ impl State for GameState {
         let mut dimp2 = DividerComponent::new(10,15,9).centered();
         self.console.temp_buffer.c_draw( &mut dimp2);
         //self.console.temp_buffer.g_draw(Circle::new(10,10,30),'2',Color::BLUE);
+        self.console.temp_buffer.set_string(1,50,"Life:",Color::WHITE);
+        self.console.temp_buffer.set_string(7,50,"9",Color::RED);
+        self.console.temp_buffer.set_string(9,50,"/",Color::WHITE);
+        self.console.temp_buffer.set_string(11,50,"10",Color::GREEN);
         self.console.draw(ctx);
         
 
@@ -149,9 +154,54 @@ impl State for GameState {
         Ok(())
     }
 }
-
+macro_rules! textcmp {
+    ($fmt_string:expr, $( $arg:expr ),*) => {
+        let regex = Regex::new(r"(?m)\{[a-zA-Z]*\}").unwrap();
+        let result = regex.find_iter($fmt_string);
+        let mut args: Vec<String> = Vec::new();
+        $(
+            args.push($arg.into());
+        )*
+        for a in args {
+            println!("Arg: {}",a);
+        }
+        for mat in result {
+            println!("Color{}",mat.as_str());
+        }
+    }
+}
+enum Colorr<D: Display> {
+    Red(D),
+    Green(D)
+}
+impl<D: Display> fmt::Display for Colorr<D> {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        Ok(match self {
+            Colorr::Red(txt) => print!("Vermelho: {}", txt.to_string()),
+            Colorr::Green(txt) => print!("Verde: {}", txt.to_string()),
+        })
+    }
+}
 fn main() -> tetra::Result {
+    /*
+    let regex = Regex::new(r"(?m)\{[a-zA-Z]*\}").unwrap();
+    let string = "{White} {red} {a}";
+  
+  // result will be an iterator over tuples containing the start and end indices for each match in the string
+    let result = regex.find_iter(string);
+    
+    for mat in result {
+        println!("{}", mat.as_str());
+        if String::from(mat.as_str()).to_lowercase().contains("white"){
+             print!("AEEE")
+        }
+        
+    }
+    */
+    //textcmp!("{white} {red} {white} {green}","life: ",9.to_string(),"/",10.to_string());
 
+    
+    let text = format!("Life: {}/{}", Colorr::Red(9), Colorr::Green("10"));
     ContextBuilder::new("Terminal", 150 * 8, 100 * 8)
        // .timestep(Timestep::Fixed(30.0))
         .quit_on_escape(true)

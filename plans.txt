@@ -64,3 +64,14 @@ let main_container = MainContainer::new(100, 100);
 let window1 = WindowContainer::new();
 window1.set_child(BoxContainer(20,20).title("Teste"));
 main_container.set_child(window1);
+
+let text = TextConponent::new()
+                          .add_text("Life: ",Color::White)
+                          .add_text(9.to_string,Color::Red)
+                          .add_text(" / ",Color::White)
+                          .add_text(10.to_string, Color::Green);
+Result: Life 9 / 10
+TextFragment {
+    text
+    color
+}
