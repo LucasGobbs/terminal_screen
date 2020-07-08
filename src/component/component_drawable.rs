@@ -17,7 +17,7 @@ pub struct Component {
     pub changed: bool,
 }
 impl Component {
-    pub fn default() ->Component {
+    pub fn default() -> Component {
         Component {
             pos: (0,0),
             size: (0,0),

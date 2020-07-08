@@ -1,5 +1,5 @@
 use tetra::graphics::Color;
-use itertools::izip;
+
 use crate::shape::ShapeDrawable;
 //use crate::container::ContainerDrawable;
 use crate::component::ComponentDrawable;
@@ -101,18 +101,16 @@ impl Buffer {
     }
     pub fn flood_fill_rec(&mut self, x: i32, y: i32, glyph: char, color: Color){
         if self.check_bound(x,y){
-            match self.get_char(x, y) {
-                Some(cell) => self.flood_fill_scanline_recursive(x,y,cell.glyph,glyph,color),
-                None => {},
+            if let Some(cell) = self.get_char(x, y)  {
+                self.flood_fill_scanline_recursive(x,y,cell.glyph,glyph,color);
             }
         }
         
     }
     pub fn flood_fill_naive_rec(&mut self, x: i32, y: i32, glyph: char, color: Color){
         if self.check_bound(x,y){
-            match self.get_char(x, y) {
-                Some(cell) => self.flood_fill_naive_recursive(x,y,cell.glyph,glyph,color),
-                None => {},
+            if let Some(cell) = self.get_char(x, y) {
+                self.flood_fill_naive_recursive(x,y,cell.glyph,glyph,color);
             }
         }
     }

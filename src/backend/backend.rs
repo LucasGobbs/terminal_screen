@@ -1,7 +1,8 @@
-use tetra::{Context, ContextBuilder, State};
+
 use crate::buffer::Buffer;
 pub trait Backend{
-    fn draw(&mut self,ctx: &mut Context,buf: Buffer);
+    type Context;
+    fn draw(&mut self, buf: Buffer, ctx: &mut Self::Context);
     fn clear(); 
 
 }
