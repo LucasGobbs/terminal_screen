@@ -16,8 +16,8 @@ pub struct Buffer {
     pub data: Vec<ConsoleCell>,
    // x: i32,
    // y: i32,
-    width: usize,
-    height: usize,
+    pub width: usize,
+    pub height: usize,
     size: usize,
 }
 #[allow(dead_code)]
@@ -287,8 +287,9 @@ impl Buffer {
         }
     }
     pub fn add_on_top(&mut self,buf: Buffer, x0: i32, y0: i32, ignore_whitespace: bool){
+      
         for (i,cell) in buf.data.iter().enumerate() {
-            let (x, y) = (i % buf.width, i / buf.width);
+            let (x, y) = (i % (buf.width  ), i / (buf.width ));
             if ignore_whitespace {
                 if cell.glyph != ' '{
                     self.set_char(x0 + x as i32, y0  + y as i32,cell.glyph,cell.foreground);
@@ -296,8 +297,8 @@ impl Buffer {
             } else {
                 self.set_char(x0 + x as i32, y0  + y as i32,cell.glyph,cell.foreground);
             }
-            
-            //print!("{} {}\n",cell.glyph, y);
+
         }
+     
     }
 }

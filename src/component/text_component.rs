@@ -1,4 +1,4 @@
-use crate::component::{ComponentDrawable,ComponentBuilder, Component};
+use crate::component::{ComponentDrawable, Component};
 use crate::buffer::Buffer;
 
 use tetra::graphics::Color;
@@ -10,9 +10,9 @@ pub struct TextComponent{
    
 }
 impl TextComponent {
-    pub fn new(builder: &mut ComponentBuilder) -> Self{
+    pub fn new(cmp: Component) -> Self{
         TextComponent{
-            component: builder.build().unwrap(),
+            component: cmp,
             text: Vec::new(),
         }
     }
@@ -27,24 +27,25 @@ impl TextComponent {
                                             |size, tuple| 
                                             size + tuple.0.len());
         self.component.size = (size as i32,1);
+        
     }
 }
 impl ComponentDrawable for TextComponent {
     fn get_buffer(self) -> Buffer{
         let size = (self.component.size.0 as usize, 
-                                    self.component.size.1 as usize);
+                    self.component.size.1 as usize);
         let mut n_buf = Buffer::new(size.0, size.1);
-        for cell in self.component.data.unwrap().data {
-            n_buf.data.push(cell);
+        for (index,cell) in self.component.data.unwrap().data.iter().enumerate() {
+            n_buf.data[index] = *cell;
         }
         n_buf
     }
     fn get_position(self) -> (i32,i32){
         self.component.pos
     }
-    fn get_size(&mut self) -> (i32,i32){
-        self.component.size
-    }
+    // fn get_size(&mut self) -> (i32,i32){
+    //     self.component.size
+    // }
     fn generate(&mut self){
         
         let pos = self.component.pos;
@@ -53,6 +54,7 @@ impl ComponentDrawable for TextComponent {
         let size = self.component.size;
         
         let mut buf = Buffer::new(size.0 as usize,size.1 as usize);
+
         let mut index = 0;
         for (word,color) in self.text.iter() {
             for (i, ch) in word.chars().enumerate() {
@@ -61,7 +63,7 @@ impl ComponentDrawable for TextComponent {
             }
             index += word.len();
         }
+   
         self.component.data = Some(buf);
-       // (buf, pos.0, pos.1)
     }
 }

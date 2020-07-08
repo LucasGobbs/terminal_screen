@@ -1,6 +1,8 @@
-use crate::component::{ComponentDrawable,ComponentBuilder, Component};
+use crate::component::{ComponentDrawable, Component};
 use crate::buffer::Buffer;
 use tetra::graphics::Color;
+
+#[derive(Clone)]
 pub struct DividerComponent {
     component: Component,
     centered: bool,
@@ -10,9 +12,9 @@ pub struct DividerComponent {
     center: char,
 }
 impl DividerComponent {
-    pub fn new(builder: ComponentBuilder) -> Self {
+    pub fn new(cmp: Component) -> Self {
         DividerComponent {
-            component: builder.build().unwrap(),
+            component: cmp,
             centered:false,
             horizontal:true,
             corners: '+',
@@ -20,52 +22,64 @@ impl DividerComponent {
             center: '@',
         }
     }
-    pub fn centered(mut self) -> Self{
+    pub fn centered(&mut self) -> &mut Self{
         self.centered = true;
         self
     }
-    pub fn vertical(mut self) -> Self{
+    pub fn vertical(&mut self) -> &mut Self{
         self.horizontal = false;
         self
     }
-    pub fn line_char(mut self, ch: char) -> Self{
+    pub fn line_char(&mut self, ch: char) -> &mut Self{
         self.line = ch;
         self
     }
-    pub fn corner_char(mut self, ch: char) -> Self{
+    pub fn corner_char(&mut self, ch: char) -> &mut Self{
         self.corners = ch;
         self
     }
-    pub fn center_char(mut self, ch: char) -> Self{
+    pub fn center_char(&mut self, ch: char) -> &mut Self{
         self.center = ch;
         self
     }
 }
 impl ComponentDrawable for DividerComponent {
-    fn get_buffer(&mut self) -> (Box<&Buffer>,i32,i32){
-        let cl = Box::new(self.component.data.as_ref().unwrap());
-
-        (cl,self.component.pos.0,self.component.pos.1)
+    fn get_buffer(self) -> Buffer{
+        let size = (self.component.size.0 as usize, 
+        self.component.size.1 as usize);
+        let mut n_buf = Buffer::new(size.0, size.1);
+        for cell in self.component.data.unwrap().data {
+            n_buf.data.push(cell);
+        }
+        n_buf
     }
+    
     fn get_position(self) -> (i32,i32){
         self.component.pos
     }
-    fn get_size(self) -> (i32,i32){
-        self.component.size
-    }
-    fn generate(&mut self) -> (Buffer,i32,i32){
+    // fn get_size(&mut self) -> (i32,i32){
+    //     self.component.size
+    // }
+    fn generate(&mut self){
         
-        let size = self.get_size();
-        let mut max_size = 0;
-        let mut increment: (i32,i32);
+        let size = self.component.size;
+        let actual_size: (i32,i32);
+        let max_size = if self.component.size.0 > self.component.size.1 {
+            self.component.size.0
+        } else {
+            self.component.size.1
+        };
+        let increment: (i32,i32);
         if self.horizontal {
-            max_size = size.0;
             increment = (1,0);
+            actual_size = (max_size,1);
         }else {
-            max_size = size.1;
             increment = (0,1);
+            actual_size = (1,max_size);
         }
-        let mut buf = Buffer::new(size.0 as usize,size.1 as usize);
+        //print!("{:?}\n",self.component.pos);
+        self.component.size = actual_size;
+        let mut buf = Buffer::new(actual_size.0 as usize, actual_size.1 as usize);
         let mut xi = 0;
         let mut yi = 0;
         let mut index = 0;
@@ -88,11 +102,6 @@ impl ComponentDrawable for DividerComponent {
         }
         
        // buf.print();
-        if self.centered {
-            (buf, self.component.pos.0 - max_size / 2, self.component.pos.1)
-        } else {
-            (buf, self.component.pos.0, self.component.pos.1)
-        }
-        
+        self.component.data = Some(buf);
     }
 }

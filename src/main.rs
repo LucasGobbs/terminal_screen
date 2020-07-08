@@ -1,9 +1,11 @@
 //mod container;
-extern crate derive_builder;
+mod backend;
+use backend::{Backend,TetraBackend};
 mod shape;
 mod buffer;
 mod console;
-#[macro_use]
+mod buffer_app;
+use crate::buffer_app::BufferApp;
 mod component;
 use tetra::graphics::{self, Color, Texture};
 use tetra::input::{self, Key};
@@ -15,7 +17,7 @@ use tetra::{Context, ContextBuilder, State};
 
 use regex::*;
 use std::fmt::{self, Display};
-use crate::component::{Component, ComponentDrawable,TextComponent, ComponentBuilder};
+use crate::component::*;
 
 use crate::shape::*;
 
@@ -67,6 +69,8 @@ struct GameState {
     drops: Vec<Drop>,
     player: Player,
     console: Console,
+    buffer_backend: TetraBackend,
+    app: BufferApp,
     el_time: f32,
 }
 
@@ -77,7 +81,8 @@ impl GameState {
        // let resources = Resources::new(&mut world);
 
         let font = Texture::new(ctx, "./resources/terminal.png")?;
-        let console = Console::new(font, 150, 100);
+        let console = Console::new(font.clone(), 150, 100);
+        let buffer_backend = TetraBackend::new(font);
         let mut drops = Vec::new();
     
         for i in 0..500 {
@@ -89,6 +94,8 @@ impl GameState {
             player: Player::new(50,50),
             drops,
             console,
+            buffer_backend,
+            app: BufferApp::new(150,100),
             el_time: 0.0,
         })
     }
@@ -136,30 +143,32 @@ impl State for GameState {
                                             '.', Color::WHITE);
         }
         self.console.temp_buffer.set_char(self.player.x,self.player.y,'█',Color::GREEN);
-        self.console.temp_buffer.set_char(mousex,mousey,'*',Color::GREEN);
+        
         //self.console.temp_buffer.g_draw(Rect::new(mousex -2,mousey-4,4,8,true), 'm', Color::rgb(1.0,1.0,0.0));
         //self.console.temp_buffer.sub(t_buffer);
         //let mut tcmp = TextComponent::new().pos(2, 5)
         //                                                      .text(String::from("Alo"));
      
-        let mut life_txt = TextComponent::new(ComponentBuilder::default()
-                                                                                        .pos((10,10))
-                                                                                        
-                                                                                        .changed(false));
-        life_txt.add_text("Life:", Color::WHITE)
-        .add_text("Pf funciona",Color::RED)
-        .generate();                              
-       
-        self.console.temp_buffer.c_draw(    life_txt);
-        //let mut dimp2 = DividerComponent::new(10,15,9).centered();
-      
-        //self.console.temp_buffer.g_draw(Circle::new(10,10,30),'2',Color::BLUE);
-        self.console.temp_buffer.set_string(1,50,"Life:",Color::WHITE);
-        self.console.temp_buffer.set_string(7,50,"9",Color::RED);
-        self.console.temp_buffer.set_string(9,50,"/",Color::WHITE);
-        self.console.temp_buffer.set_string(11,50,"10",Color::GREEN);
-        self.console.draw(ctx);
+        let mut life_txt = TextComponent::new(Component::new(0,0));
+        life_txt.add_text("Fala;",Color::WHITE)
+                .add_text(" ai mano",Color::RED)
+                .generate();
+        let mut div = DividerComponent::new(Component::new(1,10).size(11,1));
+        div.line_char('#')
+           .vertical()
+           .corner_char('@')
+           .center_char('0')
+           .generate();
         
+        self.app.buf().c_draw(life_txt);
+        self.app.buf().c_draw(div);
+        //self.console.temp_buffer.c_draw(life_txt);
+        
+        self.app.buf().set_string(mousex,mousey,
+            format!("* x:{} / y: {}",mousex,mousey).as_str(),
+            Color::GREEN);
+        //self.console.draw(ctx);
+        self.buffer_backend.draw(ctx, self.app.clone().draw(2));
 
 
         Ok(())
